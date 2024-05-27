@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Set BG using feh
+
+set_wallpaper(){
+    feh --bg-fill "$IMAGE_PATH"
+}

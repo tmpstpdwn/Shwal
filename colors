@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Create colorscheme
+
+colors(){
+    while [ ${#colors[@]} -lt 16 ] && [ $attempt -le $MAX_ATTEMPTS ]; do
+        echo "[*] Creating colorscheme attempt #$attempt"
+        magick "$IMAGE_PATH" -resize $resize% -colors 16 -unique-colors txt:- | awk '{print $3}' | tail -n 16 > "$OUTPUT_DIR/colors.txt"
+        mapfile -t colors < "$OUTPUT_DIR/colors.txt"
+        attempt=$((attempt + 1))
+        resize=$((resize + 3))
+    done
+
+    # Ensure we have at least 16 colors
+    if [ "${#colors[@]}" -lt 16 ]; then
+        echo "[ ] Error: Not enough colors extracted"
+        exit 1
+    else
+        echo "[*] Success: Colorsheme created"
+    fi
+
+    # Assign colors to variables
+    background="${colors[0]:0:7}"
+    foreground="${colors[7]:0:7}"
+    cursor="${colors[8]:0:7}"
+    color0="${colors[0]:0:7}"
+    color1="${colors[1]:0:7}"
+    color2="${colors[2]:0:7}"
+    color3="${colors[3]:0:7}"
+    color4="${colors[4]:0:7}"
+    color5="${colors[5]:0:7}"
+    color6="${colors[6]:0:7}"
+    color7="${colors[7]:0:7}"
+    color8="${colors[8]:0:7}"
+    color9="${colors[9]:0:7}"
+    color10="${colors[10]:0:7}"
+    color11="${colors[11]:0:7}"
+    color12="${colors[12]:0:7}"
+    color13="${colors[13]:0:7}"
+    color14="${colors[14]:0:7}"
+    color15="${colors[15]:0:7}"
+
+    echo "[*] Color scheme saved in $OUTPUT_DIR/colors.sh"
+}
+

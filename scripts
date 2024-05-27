@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Exec External scripts if any in ~/.config/shwal/scripts
+
+scripts(){
+    if [ -d "$SCRIPT_DIR" ] && [ "$(ls -A "$SCRIPT_DIR"/*.sh)" ]; then
+        for script in "$SCRIPT_DIR"/*.sh; do
+            if [ -f "$script" ] && [ -x "$script" ]; then
+                echo -n "[ ] Running $script ..."
+                sh "$script" > /dev/null 2> /tmp/shwall.err
+                echo -e "\r[*] Running $script ..."
+            fi
+        done
+    else
+        echo "[ ] No scripts found"
+    fi
+
+    # IF anything above goes wrong
+
+    if [ $? -ne 0 ]; then
+        echo "For Script errors check /tmp/shwall.err"
+    fi
+}
+

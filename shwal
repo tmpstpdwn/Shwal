@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Ensure an image path is provided
+if [ -z "$1" ]; then
+    echo "Usage: shwal <image_path>"
+    exit 1
+fi
+
+source ./vars
+source ./wallpaper
+source ./colors
+source ./templates
+source ./scripts
+
+set_wallpaper
+colors
+templates
+scripts
+
+# End
