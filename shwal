@@ -1,20 +1,172 @@
 #!/bin/bash
 
-# Ensure an image path is provided
-if [ -z "$1" ]; then
-    echo "Usage: shwal <image_path>"
-    exit 1
+# Important variables.
+
+THEME=0 # 0 = dark, 1 = light
+OUTPUT_DIR="$HOME/.cache/shwal"
+TEMPLATE_DIR="$HOME/.config/shwal/templates"
+SCRIPT="$HOME/.config/shwal/script"
+RELOADER="$HOME/.config/shwal/reloader"
+mkdir -p "$OUTPUT_DIR"
+
+# Create colorscheme
+
+colors(){
+    max_attempts=10
+    attempt=1
+    resize=25
+    colors=()
+    echo -ne "[ ] Creating colorscheme attempt #$attempt"
+    while [ ${#colors[@]} -lt 16 ] && [ $attempt -le $max_attempts ]; do
+        echo -ne "\r[S] Creating colorscheme attempt #$attempt"
+        magick "$1" -resize "$resize%" -colors 16 -unique-colors txt:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors.txt"
+        mapfile -t colors < "$OUTPUT_DIR/colors.txt"
+        attempt=$((attempt + 1))
+    done
+
+    echo 
+
+    # Ensure we have at least 16 colors
+
+    if [ "${#colors[@]}" -lt 16 ]; then
+        echo "[E] Not enough colors extracted"
+        exit 1
+    else
+        echo "[S] Colorsheme created and saved."
+    fi
+
+}
+
+# Set BG using feh
+
+set_wallpaper(){
+    echo -ne "[ ] wallpaper set."
+    feh --bg-fill "$1"
+    echo "$1" > ~/.cache/shwal/wallpaper
+    echo -ne "\r[S] wallpaper set."
+    echo
+}
+
+# Check for template files and process them
+
+templates(){
+    if [ -d "$TEMPLATE_DIR" ]; then
+        echo -ne "[ ] Processed templates"
+
+        # Assign colors to variables
+        background="${colors[0]:0:7}"
+        foreground="${colors[7]:0:7}"
+        cursor="${colors[8]:0:7}"
+        color0="${colors[0]:0:7}"
+        color1="${colors[1]:0:7}"
+        color2="${colors[2]:0:7}"
+        color3="${colors[3]:0:7}"
+        color4="${colors[4]:0:7}"
+        color5="${colors[5]:0:7}"
+        color6="${colors[6]:0:7}"
+        color7="${colors[7]:0:7}"
+        color8="${colors[8]:0:7}"
+        color9="${colors[9]:0:7}"
+        color10="${colors[10]:0:7}"
+        color11="${colors[11]:0:7}"
+        color12="${colors[12]:0:7}"
+        color13="${colors[13]:0:7}"
+        color14="${colors[14]:0:7}"
+        color15="${colors[15]:0:7}"
+
+        for template in "$TEMPLATE_DIR"/*; do
+            template_name=$(basename "$template")
+            output_template="$OUTPUT_DIR/$template_name"
+
+            # Replace placeholders in the template
+
+            sed \
+                -e "s/{background}/$background/g" \
+                -e "s/{foreground}/$foreground/g" \
+                -e "s/{cursor}/$cursor/g" \
+                -e "s/{color0}/$color0/g" \
+                -e "s/{color1}/$color1/g" \
+                -e "s/{color2}/$color2/g" \
+                -e "s/{color3}/$color3/g" \
+                -e "s/{color4}/$color4/g" \
+                -e "s/{color5}/$color5/g" \
+                -e "s/{color6}/$color6/g" \
+                -e "s/{color7}/$color7/g" \
+                -e "s/{color8}/$color8/g" \
+                -e "s/{color9}/$color9/g" \
+                -e "s/{color10}/$color10/g" \
+                -e "s/{color11}/$color11/g" \
+                -e "s/{color12}/$color12/g" \
+                -e "s/{color13}/$color13/g" \
+                -e "s/{color14}/$color14/g" \
+                -e "s/{color15}/$color15/g" \
+                "$template" > "$output_template"
+        done
+        echo -ne "\r[S] Processed templates"
+        echo
+    else
+        echo "[ ] No templates found in $TEMPLATE_DIR"
+    fi
+}
+
+# Exec a script after setting colorschemes and templates
+
+scripts(){
+    if [ -e "$SCRIPT" ]; then
+        echo -ne "[ ] Running Script ..."
+        sh "$SCRIPT" > /dev/null 2> /tmp/shwal.scr
+         echo -ne "\r[S] Running Script ..."
+    else
+        echo "[ ] No scripts found"
+    fi
+    echo
+}
+
+# Exec reloader script to reload colorscheme on some software.
+
+reloader() {
+    if [ -e $RELOADER ]; then
+        echo -ne "[ ] Reloading ..."
+        sh $RELOADER > /dev/null 2> /tmp/shwal.rld
+        echo -ne "\r[S] Reloading ..."
+    else
+        echo "[ ] No reloader found."
+    fi
+    echo
+}
+
+help_text(){
+    echo 
+    echo "Usage: shwal [OPTIONS] [FILE]"
+    echo "Set wallpaper and generate colorscheme from an image."
+    echo
+    echo "Options:"
+    echo "  -i FILE    Set wallpaper and generate colorscheme from FILE."
+    echo "  -r         Restore wallpaper and reload colorscheme."
+    echo
+    echo "Examples:"
+    echo "  shwal -i ~/Pictures/wallpaper.jpg"
+    echo "  shwal -r"
+    echo 
+}
+
+# MAIN
+
+if [ "$1" = "-i" ] && file --mime-type "$2" | grep -q "image"; then
+    colors $2
+    set_wallpaper $2
+    templates
+    scripts
+    reloader
+elif [ "$1" = "-r" ]; then
+    wallpaper=$(head "$OUTPUT_DIR/wallpaper" -n 1  | sed 's/[[:space:]]S$//') > /dev/null 2>&1
+    if [ ${#wallpaper} -ne 0 ]; then
+        set_wallpaper $wallpaper
+    fi
+    reloader
+else
+    help_text
 fi
 
-source ./vars
-source ./wallpaper
-source ./colors
-source ./templates
-source ./scripts
-
-set_wallpaper
-colors
-templates
-scripts
-
 # End
+
