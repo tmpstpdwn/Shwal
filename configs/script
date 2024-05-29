@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source $HOME/.config/shwal/scripts/dunst.sh
+source $HOME/.config/shwal/scripts/mpv.sh
+source $HOME/.config/shwal/scripts/zathura.sh
+source $HOME/.config/shwal/scripts/xmonad.sh

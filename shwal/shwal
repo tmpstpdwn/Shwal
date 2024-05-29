@@ -2,7 +2,6 @@
 
 # Important variables.
 
-THEME=0 # 0 = dark, 1 = light
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
 SCRIPT="$HOME/.config/shwal/script"
@@ -14,13 +13,12 @@ mkdir -p "$OUTPUT_DIR"
 colors(){
     max_attempts=10
     attempt=1
-    resize=25
     colors=()
     echo -ne "[ ] Creating colorscheme attempt #$attempt"
     while [ ${#colors[@]} -lt 16 ] && [ $attempt -le $max_attempts ]; do
         echo -ne "\r[S] Creating colorscheme attempt #$attempt"
-        magick "$1" -resize "$resize%" -colors 16 -unique-colors txt:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors.txt"
-        mapfile -t colors < "$OUTPUT_DIR/colors.txt"
+        magick "$1" -resize 25% -colors 16 -unique-colors:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors"
+        mapfile -t colors < "$OUTPUT_DIR/colors"
         attempt=$((attempt + 1))
     done
 
@@ -34,7 +32,41 @@ colors(){
     else
         echo "[S] Colorsheme created and saved."
     fi
+}
 
+colors_from_json(){
+    if ! command -v jq &> /dev/null; then
+        echo "[E] 'jq' command not found. Please install 'jq' to use this feature."
+        exit 1
+    fi
+
+    json_file="$1"
+    colors=()
+    echo -ne "[ ] Reading colors from JSON file."
+
+    background=$(jq -r '.special.background' "$json_file")
+    foreground=$(jq -r '.special.foreground' "$json_file")
+    cursor=$(jq -r '.special.cursor' "$json_file")
+
+    for i in {0..15}; do
+        colors+=($(jq -r ".colors.color$i" "$json_file"))
+    done
+
+    if [ "${#colors[@]}" -lt 16 ]; then
+        echo "[E] JSON file does not contain enough colors."
+        exit 1
+    fi
+
+    echo "$background" > "$OUTPUT_DIR/colors"
+    echo "$foreground" >> "$OUTPUT_DIR/colors"
+    echo "$cursor" >> "$OUTPUT_DIR/colors"
+    for color in "${colors[@]}"; do
+        echo "$color" >> "$OUTPUT_DIR/colors"
+    done
+
+    echo -ne "\r[S] Colorscheme created from JSON file and saved."
+
+    echo
 }
 
 # Set BG using feh
@@ -114,7 +146,7 @@ templates(){
 scripts(){
     if [ -e "$SCRIPT" ]; then
         echo -ne "[ ] Running Script ..."
-        sh "$SCRIPT" > /dev/null 2> /tmp/shwal.scr
+        sh "$SCRIPT"
          echo -ne "\r[S] Running Script ..."
     else
         echo "[ ] No scripts found"
@@ -127,7 +159,7 @@ scripts(){
 reloader() {
     if [ -e $RELOADER ]; then
         echo -ne "[ ] Reloading ..."
-        sh $RELOADER > /dev/null 2> /tmp/shwal.rld
+        sh $RELOADER
         echo -ne "\r[S] Reloading ..."
     else
         echo "[ ] No reloader found."
@@ -141,12 +173,18 @@ help_text(){
     echo "Set wallpaper and generate colorscheme from an image."
     echo
     echo "Options:"
-    echo "  -i FILE    Set wallpaper and generate colorscheme from FILE."
-    echo "  -r         Restore wallpaper and reload colorscheme."
+    echo "  -i <image>    Set wallpaper and generate colorscheme from <image>."
+    echo "  -j <json>     Set colorscheme from <json>."
+    echo "  -r            Restore wallpaper and reload colorscheme."
     echo
     echo "Examples:"
     echo "  shwal -i ~/Pictures/wallpaper.jpg"
+    echo "  shwal -j ~/Files/gruvbox.json"
     echo "  shwal -r"
+    echo
+    echo "Note:"
+    echo "  -i will set the wallpaper and also change the colorschome while"
+    echo "  -j will only make changes to the colorscheme"
     echo 
 }
 
@@ -155,6 +193,11 @@ help_text(){
 if [ "$1" = "-i" ] && file --mime-type "$2" | grep -q "image"; then
     colors $2
     set_wallpaper $2
+    templates
+    scripts
+    reloader
+elif [ "$1" = "-j" ] && file --mime-type "$2" | grep -q "json"; then
+    colors_from_json $2
     templates
     scripts
     reloader
