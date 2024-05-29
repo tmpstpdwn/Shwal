@@ -5,7 +5,6 @@
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
 SCRIPT="$HOME/.config/shwal/script"
-RELOADER="$HOME/.config/shwal/reloader"
 mkdir -p "$OUTPUT_DIR"
 
 # Create colorscheme
@@ -17,7 +16,7 @@ colors(){
     echo -ne "[ ] Creating colorscheme attempt #$attempt"
     while [ ${#colors[@]} -lt 16 ] && [ $attempt -le $max_attempts ]; do
         echo -ne "\r[S] Creating colorscheme attempt #$attempt"
-        magick "$1" -resize 25% -colors 16 -unique-colors:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors"
+        magick "$1" -resize 25% -colors 16 -unique-colors txt:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors"
         mapfile -t colors < "$OUTPUT_DIR/colors"
         attempt=$((attempt + 1))
     done
@@ -146,23 +145,10 @@ templates(){
 scripts(){
     if [ -e "$SCRIPT" ]; then
         echo -ne "[ ] Running Script ..."
-        sh "$SCRIPT"
+        sh "$SCRIPT" > /dev/null 2>&1
          echo -ne "\r[S] Running Script ..."
     else
         echo "[ ] No scripts found"
-    fi
-    echo
-}
-
-# Exec reloader script to reload colorscheme on some software.
-
-reloader() {
-    if [ -e $RELOADER ]; then
-        echo -ne "[ ] Reloading ..."
-        sh $RELOADER
-        echo -ne "\r[S] Reloading ..."
-    else
-        echo "[ ] No reloader found."
     fi
     echo
 }
@@ -174,8 +160,8 @@ help_text(){
     echo
     echo "Options:"
     echo "  -i <image>    Set wallpaper and generate colorscheme from <image>."
-    echo "  -j <json>     Set colorscheme from <json>."
-    echo "  -r            Restore wallpaper and reload colorscheme."
+    echo "  -j <json>     load colorscheme from <json>."
+    echo "  -r            Restore wallpaper."
     echo
     echo "Examples:"
     echo "  shwal -i ~/Pictures/wallpaper.jpg"
@@ -195,18 +181,15 @@ if [ "$1" = "-i" ] && file --mime-type "$2" | grep -q "image"; then
     set_wallpaper $2
     templates
     scripts
-    reloader
 elif [ "$1" = "-j" ] && file --mime-type "$2" | grep -q "json"; then
     colors_from_json $2
     templates
     scripts
-    reloader
 elif [ "$1" = "-r" ]; then
     wallpaper=$(head "$OUTPUT_DIR/wallpaper" -n 1  | sed 's/[[:space:]]S$//') > /dev/null 2>&1
     if [ ${#wallpaper} -ne 0 ]; then
         set_wallpaper $wallpaper
     fi
-    reloader
 else
     help_text
 fi
