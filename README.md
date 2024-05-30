@@ -16,22 +16,24 @@ Set wallpaper and generate colorscheme from an image.
 Options:
   -i <image>    Set wallpaper and generate colorscheme from <image>.
   -j <json>     load colorscheme from <json>.
+  -s <script>   Run an external script.
   -r            Restore wallpaper.
 
 Examples:
   shwal -i ~/Pictures/wallpaper.jpg
   shwal -j ~/Files/gruvbox.json
+  shwal -s ~/.config/shwal/script
   shwal -r
 
 Note:
   -i will set the wallpaper and also change the colorschome while.
   -j will only make changes to the colorscheme.
 ```
-- `-i <image>` : This option will set <image> as wallpaper, generate and apply colorcheme, process templates with the new colorcheme, run the `script` file.
-- `j <json>`   : This flag can be used to load a colorscheme from a json file. 
-- `-r`         : This flag will reset the wallpaper to the last used one. this flag should be used to put wallpaper
-                 on the screen after a reboot. put it in your startscript.
-
+- `-i <image>`  : This option will set <image> as wallpaper, generate and apply colorcheme, process templates with the new colorcheme, run the `script` file.
+- `-j <json>`   : This flag can be used to load a colorscheme from a json file. 
+- `-s <script>` : Execute an external script.
+- `-r`          : This flag will reset the wallpaper to the last used one. this flag should be used to put wallpaper
+                  on the screen after a reboot. put it in your startscript.
 
 ## Installation
 
@@ -50,6 +52,7 @@ The `setup.sh` also installs some configs to your `$HOME/.config/shwal`.
 - `ImageMagick` (magick) for color extraction.
 - `feh` for setting wallpaper.
 - `jq` for setting colorsheme from json files. 
+- `bc` for arithmetic, if you already dont have it.
 
 ## Configuration
 
@@ -76,17 +79,7 @@ The `setup.sh` also installs some configs to your `$HOME/.config/shwal`.
     }
     ```
     
-  - ## `$HOME/.config/shwal/script`
-    
-    A shell script that will automaticaly be run after colorscheme generation. This script can be used to
-    to execute anything you would like after the colorschemes are generated for example i use it to enforce
-    the theme generated to xmonad, mpv, dunst etc .. by using `sed` to change color variable values in their configs and
-    reload those software with new colorscheme.
-    This is a good workaround for those software for whom you dont know how color templates are to be made / imported to the
-    respective configs etc ...
-
   - ## `$HOME/.config/shwal/colorschemes`
-    
     This folder have an extensive collection of dark and light themes saved as json files which can be used with shwal. This folder was taken from the `pywal` project.
 
 - Customize the script to match your setup.
@@ -97,5 +90,5 @@ Contributions are welcome! Feel free to fork the repository and submit pull requ
 
 ## License
 
-This project is licensed under the GPLv3 License.
+This project is licensed under the GPLv3 [License](LICENSE).
 

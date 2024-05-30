@@ -4,11 +4,34 @@
 
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
-SCRIPT="$HOME/.config/shwal/script"
 mkdir -p "$OUTPUT_DIR"
 
 # Create colorscheme
 
+# Function to calculate the luminance of a color
+luminance() {
+    local hex=$1
+    local r=$(printf "%d" "0x${hex:1:2}")
+    local g=$(printf "%d" "0x${hex:3:2}")
+    local b=$(printf "%d" "0x${hex:5:2}")
+    echo "scale=4; 0.2126 * $r + 0.7152 * $g + 0.0722 * $b" | bc
+}
+
+# Sort colors based on luminance
+sort_colors(){
+    declare -A luminance_values
+
+    for color in "${colors[@]}"; do
+        luminance_values[$color]=$(luminance "$color")
+    done
+
+    sorted_colors=($(for color in "${!luminance_values[@]}"; do
+        echo "$color ${luminance_values[$color]}"
+    done | sort -n -k 2 | awk '{print $1}'))
+    colors=("${sorted_colors[@]}")
+}
+
+# Get colors from an image
 colors(){
     max_attempts=10
     attempt=1
@@ -23,16 +46,16 @@ colors(){
 
     echo 
 
-    # Ensure we have at least 16 colors
-
     if [ "${#colors[@]}" -lt 16 ]; then
         echo "[E] Not enough colors extracted"
         exit 1
     else
+        sort_colors
         echo "[S] Colorsheme created and saved."
     fi
 }
 
+# Get and set colorscheme from json file.
 colors_from_json(){
     if ! command -v jq &> /dev/null; then
         echo "[E] 'jq' command not found. Please install 'jq' to use this feature."
@@ -140,19 +163,7 @@ templates(){
     fi
 }
 
-# Exec a script after setting colorschemes and templates
-
-scripts(){
-    if [ -e "$SCRIPT" ]; then
-        echo -ne "[ ] Running Script ..."
-        sh "$SCRIPT" > /dev/null 2>&1
-         echo -ne "\r[S] Running Script ..."
-    else
-        echo "[ ] No scripts found"
-    fi
-    echo
-}
-
+# Help string
 help_text(){
     echo 
     echo "Usage: shwal [OPTIONS] [FILE]"
@@ -161,11 +172,13 @@ help_text(){
     echo "Options:"
     echo "  -i <image>    Set wallpaper and generate colorscheme from <image>."
     echo "  -j <json>     load colorscheme from <json>."
+    echo "  -s <script>   Run an external script."
     echo "  -r            Restore wallpaper."
     echo
     echo "Examples:"
     echo "  shwal -i ~/Pictures/wallpaper.jpg"
     echo "  shwal -j ~/Files/gruvbox.json"
+    echo "  shwal -s ~/.config/shwal/script"
     echo "  shwal -r"
     echo
     echo "Note:"
@@ -176,23 +189,42 @@ help_text(){
 
 # MAIN
 
-if [ "$1" = "-i" ] && file --mime-type "$2" | grep -q "image"; then
-    colors $2
-    set_wallpaper $2
-    templates
-    scripts
-elif [ "$1" = "-j" ] && file --mime-type "$2" | grep -q "json"; then
-    colors_from_json $2
-    templates
-    scripts
-elif [ "$1" = "-r" ]; then
-    wallpaper=$(head "$OUTPUT_DIR/wallpaper" -n 1  | sed 's/[[:space:]]S$//') > /dev/null 2>&1
-    if [ ${#wallpaper} -ne 0 ]; then
-        set_wallpaper $wallpaper
-    fi
-else
-    help_text
-fi
+case $1 in
+    "-i")
+        if file --mime-type "$2" | grep -q "image"; then
+            colors $2
+            set_wallpaper $2
+            templates
+        else
+            echo "Try: shwal -h"
+        fi
+        ;;
+    "-j")
+        if file --mime-type "$2" | grep -q "json"; then
+            colors_from_json $2
+            templates
+        else
+            echo "Try: shwal -h"
+        fi
+        ;;
+    "-s")
+        if [ -n "$2" ] && [ -x "$2" ]; then
+            ./"$2" > /dev/null 2>&1
+        else
+            echo "Try: shwal -h"
+        fi
+        ;;
+    "-r")
+        wallpaper=$(head "$OUTPUT_DIR/wallpaper" -n 1  | sed 's/[[:space:]]S$//') > /dev/null 2>&1
+        if [ -e "$wallpaper" ]; then
+            set_wallpaper $wallpaper
+        else
+            echo "Try: shwal -h"
+        fi
+        ;;
+    *)
+        help_text
+        ;;
+esac
 
 # End
-
