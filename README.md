@@ -29,9 +29,9 @@ Note:
   -i will set the wallpaper and also change the colorschome while.
   -j will only make changes to the colorscheme.
 ```
-- `-i <image>`  : This option will set <image> as wallpaper, generate and apply colorcheme, process templates with the new colorcheme, run the `script` file.
+- `-i <image>`  : This option will set <image> as wallpaper, generate colorcheme, process templates with the new colorcheme.
 - `-j <json>`   : This flag can be used to load a colorscheme from a json file. 
-- `-s <script>` : Execute an external script.
+- `-s <script>` : Execute an external script. This could be usefull to restart programs so that new templates can be applied.
 - `-r`          : This flag will reset the wallpaper to the last used one. this flag should be used to put wallpaper
                   on the screen after a reboot. put it in your startscript.
 
