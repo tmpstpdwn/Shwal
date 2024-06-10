@@ -16,36 +16,32 @@ Set wallpaper and generate colorscheme from an image.
 Options:
   -i <image>    Set wallpaper and generate colorscheme from <image>.
   -j <json>     load colorscheme from <json>.
-  -s <script>   Run an external script.
   -r            Restore wallpaper.
 
 Examples:
   shwal -i ~/Pictures/wallpaper.jpg
   shwal -j ~/Files/gruvbox.json
-  shwal -s ~/.config/shwal/script
   shwal -r
 
 Note:
   -i will set the wallpaper and also change the colorschome while.
   -j will only make changes to the colorscheme.
 ```
-- `-i <image>`  : This option will set <image> as wallpaper, generate colorcheme, process templates with the new colorcheme.
-- `-j <json>`   : This flag can be used to load a colorscheme from a json file. 
-- `-s <script>` : Execute an external script. This could be usefull to restart programs so that new templates can be applied.
+- `-i <image>`  : This option will set <image> as wallpaper, generate colorcheme, process templates with the new colorcheme. also
+                  run a script assigned to `SCRIPT` variable inside the `shwal` script file.
+- `-j <json>`   : This flag can be used to load a colorscheme from a json file, process templates with the new colorcheme. also
+                  run a script assigned to `SCRIPT` variable inside the `shwal` script file. 
 - `-r`          : This flag will reset the wallpaper to the last used one. this flag should be used to put wallpaper
                   on the screen after a reboot. put it in your startscript.
 
 ## Installation
 
-Clone this repository.
-Make the script executable:
-
-```sh
-chmod +x setup.sh
-```
-Run the script and the program should be installed to your `$HOME/.local/bin`. make sure that this path is in
-the `$PATH` variable.
-The `setup.sh` also installs some configs to your `$HOME/.config/shwal`.
+- Clone this repository.
+- `cd Shwal`
+- Move the `shwal/shwal` script to a directory in your path variable.
+- Move the `.config/shwal` to `~/.config/shwal`. This will give you access to a whole colldection of premade themes stored in json format
+  , also to some premade templates.
+- After these steps, `shwal` command can be run as per the options given in the `Usage` section.
 
 ## Dependencies
 
@@ -57,6 +53,8 @@ The `setup.sh` also installs some configs to your `$HOME/.config/shwal`.
 ## Configuration
 
 - Current wallpaper path, Colorschemed templates generated are stored in `$HOME/cache/shwal`.
+- Additionaly an external script or program can be run after a colorscheme is generated. How this can be done is 
+  specified inside the `Usage` section.
 - Config files as stored in `$HOME/.config/shwal`. The following are the contents of the this folder:
   
   - ## `$HOME/.config/shwal/templates`
