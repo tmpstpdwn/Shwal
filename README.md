@@ -38,7 +38,7 @@ Note:
 
 - Clone this repository.
 - `cd Shwal`
-- Move the `shwal/shwal` script to a directory in your path variable.
+- Move the `src/shwal` script to a directory in your path variable.
 - Move the `.config/shwal` to `~/.config/shwal`. This will give you access to a whole colldection of premade themes stored in json format
   , also to some premade templates.
 - After these steps, `shwal` command can be run as per the options given in the `Usage` section.
