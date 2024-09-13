@@ -40,7 +40,7 @@ Note:
 - `cd Shwal`
 - Move the `src/shwal` script to a directory in your path variable.
 - Move the `.config/shwal` to `~/.config/shwal`. This will give you access to a whole colldection of premade themes stored in json format
-  , also to some premade templates.
+  , also to some pre-made templates.
 - After these steps, `shwal` command can be run as per the options given in the `Usage` section.
 
 ## Dependencies
@@ -79,6 +79,9 @@ Note:
     
   - ## `$HOME/.config/shwal/colorschemes`
     This folder have an extensive collection of dark and light themes saved as json files which can be used with shwal. This folder was taken from the `pywal` project.
+    
+  - ## `$HOME/.config/shwal/scripts`
+    This folder contains an example external script that applies the sourced colors to softwares like zathura, dunst, polybar and also to xmonad wm.
 
 - Customize the script to match your setup.
 
