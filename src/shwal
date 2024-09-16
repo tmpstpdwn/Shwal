@@ -3,7 +3,7 @@
 # Important variables.
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
-SCRIPT=
+SCRIPTS_DIR="$HOME/.config/shwal/scripts"
 cols_gen=false
 
 # Check for the existance of output dir.
@@ -158,14 +158,25 @@ templates(){
 }
 
 # Exec a script after succesfully setting a colorscheme.
-script() {
+scripts() {
     echo -ne "[ ] Script: Running external script"
-    "$1" > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        echo -e "\r[S] Script: Running external script"
-    else
-        echo -e "\r[E] Script: External script execution failed"
+    # Check if the directory exists
+    if [[ ! -d "$SCRIPTS_DIR" ]]; then
+        echo -e "\r[E] Script: No script found."
+        exit 1
     fi
+    echo -e "\r[S] Script: Running external script"
+    # Iterate over all files in the directory
+    for file in "$SCRIPTS_DIR"/*; do
+        # Check if it's a regular file and if it's executable
+        if [[ -f "$file" && -x "$file" ]]; then
+            "$file" > /dev/null 2>&1 # Execute the file
+            if [ $? -eq 1 ]; then
+                echo -e "\r[E] Script: External script execution failed"
+                exit 1
+            fi
+        fi
+    done
 }
 
 # Help string
@@ -206,7 +217,7 @@ case $1 in
             colors $2
             cols_gen_check
             templates
-            script $SCRIPT
+            scripts
         else
             echo "Try: shwal -h"
         fi
@@ -216,7 +227,7 @@ case $1 in
             colors_from_json $2
             cols_gen_check
             templates
-            script $SCRIPT
+            scripts
         else
             echo "Try: shwal -h"
         fi

@@ -36,13 +36,28 @@ Note:
 
 ## Installation
 
-- For those on arch can make use of the PKGBUILD.
-- Clone this repository.
-- `cd Shwal`
-- Move the `src/shwal` script to a directory in your path variable.
-- Move the `.config/shwal` to `~/.config/shwal`. This will give you access to a whole colldection of premade themes stored in json format
-  , also to some pre-made templates.
-- After these steps, `shwal` command can be run as per the options given in the `Usage` section.
+### Arch users
+
+```bash
+git clone https://github.com/tmpstpdwn/shwal.git
+cd shwal
+mkdir pkgbuild
+mv PKGBUILD pkgbuild
+cd pkgbuild
+makepkg -si
+```
+
+### Others
+
+```bash
+git clone https://github.com/tmpstpdwn/shwal.git
+cd shwal
+mv src/shwal ~/.local/bin
+mkdir -p ~/.config/shwal
+mv config/* ~/.config/shwal
+```
+
+- Make sure that `~/.local/bin` is in `$PATH`.
 
 ## Dependencies
 
@@ -55,8 +70,15 @@ Note:
 
 - Current wallpaper path, Colorschemed templates generated are stored in `$HOME/cache/shwal`.
 - Additionaly an external script or program can be run after a colorscheme is generated. How this can be done is 
-  specified inside the `Usage` section.
-- Config files as stored in `$HOME/.config/shwal`. The following are the contents of the this folder:
+  explained inside the `Usage` section.
+- Config files should be stored in `$HOME/.config/shwal`. If installed via `PKGBUILD` then:
+  ```bash
+  mkdir -p ~/.config/shwal
+  cp /usr/share/shwal/config/* ~/.config/shwal/
+  ```
+  .
+  The following are the contents of the this folder:
+
   
   - ## `$HOME/.config/shwal/templates`
     A folder where templates can be stored.
@@ -82,7 +104,7 @@ Note:
     This folder have an extensive collection of dark and light themes saved as json files which can be used with shwal. This folder was taken from the `pywal` project.
     
   - ## `$HOME/.config/shwal/scripts`
-    This folder contains an example external script that applies the sourced colors to softwares like zathura, dunst, polybar and also to xmonad wm.
+    Executable scripts placed inside this folder will be executed after generating the templates.
 
 - Customize the script to match your setup.
 

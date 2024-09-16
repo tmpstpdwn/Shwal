@@ -19,8 +19,10 @@ pkgver() {
 
 package() {
   mkdir -p "${pkgdir}"/usr/bin
+  mkdir -p "${pkgdir}"/usr/share/"${pkgname}"/config
   cd "$srcdir/$pkgname"
   install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
   install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
   install -Dm755 src/* "${pkgdir}"/usr/bin/
+  install -Dm644 config/* "${pkgdir}"/usr/share/"${pkgname}"/config
 }
