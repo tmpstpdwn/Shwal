@@ -36,6 +36,7 @@ Note:
 
 ## Installation
 
+- For those on arch can make use of the PKGBUILD.
 - Clone this repository.
 - `cd Shwal`
 - Move the `src/shwal` script to a directory in your path variable.
