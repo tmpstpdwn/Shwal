@@ -1,6 +1,6 @@
 # Maintainer: Tmpstpdwn <tmpstpdwn@tuta.io>
 pkgname=shwal
-pkgver=1.0
+pkgver=1.0.r18.6cb11fc
 pkgrel=1
 pkgdesc="Set wallpaper and create colorschemes effortlesly. inspired by pywal."
 arch=('x86_64')
@@ -24,5 +24,5 @@ package() {
   install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
   install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
   install -Dm755 src/* "${pkgdir}"/usr/bin/
-  install -Dm644 config/* "${pkgdir}"/usr/share/"${pkgname}"/config
+  cp -a config/. "${pkgdir}/usr/share/${pkgname}/config/"
 }

@@ -2,6 +2,8 @@
 
 - `shwal` is a bash script to set wallpaper and generate color schemes from an image.
 - It allows you to use templates so that new colorschemes can be applied across many softwares effortlessly.
+- You can also run executables after producing the colorscheme by placing them in `~/.config/shwal/scripts`.
+  This is useful to refresh softwares so that the new coloscheme is in effect.
 
 ## shwal integrated with lf filemanager.
 
@@ -24,30 +26,17 @@ Examples:
   shwal -r
 
 Note:
-  -i will set the wallpaper and also change the colorschome while.
+  -i will set the wallpaper and also change the colorscheme while.
   -j will only make changes to the colorscheme.
 ```
-- `-i <image>`  : This option will set <image> as wallpaper, generate colorcheme, process templates with the new colorcheme. also
-                  run a script assigned to `SCRIPT` variable inside the `shwal` script file.
-- `-j <json>`   : This flag can be used to load a colorscheme from a json file, process templates with the new colorcheme. also
-                  run a script assigned to `SCRIPT` variable inside the `shwal` script file. 
+- `-i <image>`  : This option will set <image> as wallpaper, generate colorcheme, process templates with the new colorcheme.
+                  also run executables inside `~/.config/shwal/scripts`.
+- `-j <json>`   : This flag can be used to load a colorscheme from a json file, process templates with the new colorcheme. also 
+                  run executables inside `~/.config/shwal/scripts`.
 - `-r`          : This flag will reset the wallpaper to the last used one. this flag should be used to put wallpaper
                   on the screen after a reboot. put it in your startscript.
 
 ## Installation
-
-### Arch users
-
-```bash
-git clone https://github.com/tmpstpdwn/shwal.git
-cd shwal
-mkdir pkgbuild
-mv PKGBUILD pkgbuild
-cd pkgbuild
-makepkg -si
-```
-
-### Others
 
 ```bash
 git clone https://github.com/tmpstpdwn/shwal.git
@@ -69,17 +58,11 @@ mv config/* ~/.config/shwal
 ## Configuration
 
 - Current wallpaper path, Colorschemed templates generated are stored in `$HOME/cache/shwal`.
-- Additionaly an external script or program can be run after a colorscheme is generated. How this can be done is 
+- Additionaly executables can be run after a colorscheme is generated. How this can be done is 
   explained inside the `Usage` section.
-- Config files should be stored in `$HOME/.config/shwal`. If installed via `PKGBUILD` then:
-  ```bash
-  mkdir -p ~/.config/shwal
-  cp /usr/share/shwal/config/* ~/.config/shwal/
-  ```
-  .
+- Config files should be stored in `$HOME/.config/shwal`.
   The following are the contents of the this folder:
 
-  
   - ## `$HOME/.config/shwal/templates`
     A folder where templates can be stored.
     The way templates work is that you can store your template files in this folder. inside a template file
