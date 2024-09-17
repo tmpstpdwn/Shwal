@@ -49,7 +49,7 @@ colors(){
         echo -e "\r[ ] Colors: No change in colorscheme. Not enough colors extracted."
     else
         sort_colors
-        echo -e "\r[S] Colors: Colorsheme created and saved."
+        echo -e "\r[S] Colors: Colorsheme created and saved.  "
         cols_gen=true
     fi
 }
@@ -100,7 +100,7 @@ set_wallpaper(){
 # Check for template files and process them
 templates(){
     if [ -d "$TEMPLATE_DIR" ]; then
-        echo -ne "[ ] Templates: Processed templates"
+        echo -ne "[ ] Templates: Processed templates."
 
         # Assign colors to variables
         background="${colors[0]:0:7}"
@@ -151,15 +151,15 @@ templates(){
                 -e "s/{color15}/$color15/g" \
                 "$template" > "$output_template"
         done
-        echo -e "\r[S] Templates: Processed templates"
+        echo -e "\r[S] Templates: Processed templates."
     else
-        echo "[ ] Templates: No templates found in $TEMPLATE_DIR"
+        echo "[ ] Templates: No templates found in $TEMPLATE_DIR."
     fi
 }
 
 # Exec a script after succesfully setting a colorscheme.
 scripts() {
-    echo -ne "[ ] Script: Running external script"
+    echo -ne "[ ] Script: Running external scripts."
     # Check if the directory exists
     if [[ ! -d "$SCRIPTS_DIR" ]]; then
         echo -e "\r[E] Script: No script found."
@@ -172,11 +172,12 @@ scripts() {
         if [[ -f "$file" && -x "$file" ]]; then
             "$file" > /dev/null 2>&1 # Execute the file
             if [ $? -eq 1 ]; then
-                echo -e "\r[E] Script: External script execution failed"
+                echo -e "\r[E] Script: External script execution failed."
                 exit 1
             fi
         fi
     done
+    echo -ne "[S] Script: External scripts run."
 }
 
 # Help string
