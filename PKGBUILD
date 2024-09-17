@@ -1,5 +1,6 @@
 # Maintainer: Tmpstpdwn <tmpstpdwn@tuta.io>
 pkgname=shwal
+_pkgver=1.0
 pkgver=1.0.r18.6cb11fc
 pkgrel=1
 pkgdesc="Set wallpaper and create colorschemes effortlesly. inspired by pywal."
@@ -14,7 +15,7 @@ md5sums=('SKIP')
 
 pkgver() {
   cd "$srcdir/$pkgname"
-  printf "1.0.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  printf "${_pkgver}.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 package() {
