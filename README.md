@@ -15,18 +15,14 @@ Set wallpaper and generate colorscheme from an image.
 
 Options:
   -w <image>    Set wallpaper.
-  -i <image>    Set wallpaper, generate colorscheme from <image> and process templates.
-  -j <json>     load colorscheme/process templates from <json>.
+  -i <image>    Set wallpaper, generate colorscheme from <image>.
+  -j <json>     load colorscheme from <json>.
   -r            Restore wallpaper.
-
-Examples:
-  shwal -i ~/Pictures/wallpaper.jpg
-  shwal -j ~/Files/gruvbox.json
-  shwal -r
 ```
-- `-w <image>`  : This option will set <image> as wallpaper.
-- `-i <image>`  : This option will set <image> as wallpaper, generate colorcheme, process templates with the new colorcheme.
-- `-j <json>`   : This flag can be used to load a colorscheme from a json file, process templates with the new colorcheme.
+
+- `-w <image>`  : This option will set 'image' as wallpaper.
+- `-i <image>`  : This option will set 'image' as wallpaper, generate colorcheme, save the colorscheme and also process templates.
+- `-j <json>`   : This flag can be used to load a colorscheme from a json file and also process templates.
 - `-r`          : This flag will reset the wallpaper to the last used one.
 
 ## Installation
@@ -50,33 +46,31 @@ mv config/* ~/.config/shwal
 
 ## Configuration
 
-- Current wallpaper path, Colorschemed templates generated are stored in `$HOME/cache/shwal`.
-- The following are the contents of the folder `$HOME/.config/shwal` :
-
-  - ## `$HOME/.config/shwal/templates`
-    A folder where templates can be stored.
-    The way templates work is that you can store your template files in this folder. inside a template file
-    colors can be substituted from the generated colorscheme by using `{color-key}`.
-    The following are the colorkeys
+- ### Templates :
+  
+    - Templates are stored in `$HOME/.config/shwal/templates`.
+    - The way templates work is that you can store your template files in this folder.
+    -  inside a template file colors can be substituted from the generated colorscheme by using `{color-key}`.
+    - The following are the colorkeys
     `foreground`, `background`, `cursor`, `color0` ... `color15`.
+  
+    - The following is an example of a color template.
+  
+      ```
+      * {
+      background: {background};
+      background-alt: {background};
+      foreground: {foreground};
+      selected: {cursor};
+      active: {color10};
+      urgent: {color9};
+      }
+      ```
+  
+   - Colorschemed templates generated are stored in `$HOME/cache/shwal`.
 
-    The following is an example of a color template.
-
-    ```
-    * {
-    background: {background};
-    background-alt: {background};
-    foreground: {foreground};
-    selected: {cursor};
-    active: {color10};
-    urgent: {color9};
-    }
-    ```
-
-  - ## `$HOME/.config/shwal/jsons`
-    Colorschemes generated will be save here as json so that it can be reloaded later.
-    
-- Customize the script to match your setup.
+- ### Saved colorschemes.
+    Colorschemes generated will be saved in `$HOME/.config/shwal/jsons` as json, so that it can be reloaded later.
 
 ## Contributing
 
