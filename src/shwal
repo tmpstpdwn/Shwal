@@ -175,26 +175,16 @@ templates(){
 
 # Help string
 help_text(){
-    echo 
+    echo ""
     echo "Usage: shwal [OPTIONS] [FILE]"
     echo "Set wallpaper and generate colorscheme from an image."
-    echo
+    echo ""
     echo "Options:"
     echo "  -w <image>    Set wallpaper."
-    echo "  -i <image>    Set wallpaper and generate colorscheme from <image>."
+    echo "  -i <image>    Set wallpaper, generate colorscheme from <image>."
     echo "  -j <json>     load colorscheme from <json>."
     echo "  -r            Restore wallpaper."
-    echo
-    echo "Examples:"
-    echo "  shwal -w ~/Pictures/wallpaper.jpg"
-    echo "  shwal -i ~/Pictures/wallpaper.jpg"
-    echo "  shwal -j ~/Files/gruvbox.json"
-    echo "  shwal -r"
-    echo
-    echo "Note:"
-    echo "  -i will set the wallpaper and also change the colorschome while"
-    echo "  -j will only make changes to the colorscheme"
-    echo 
+    echo ""
 }
 
 # do when colors are generated.
