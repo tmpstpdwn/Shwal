@@ -3,11 +3,12 @@
 # Important variables.
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
-SCRIPTS_DIR="$HOME/.config/shwal/scripts"
+JSON_DIR="$HOME/.config/shwal/jsons"
 cols_gen=false
 
 # Check for the existance of output dir.
 mkdir -p "$OUTPUT_DIR"
+mkdir -p "$JSON_DIR"
 
 # Function to calculate the luminance of a color
 luminance() {
@@ -34,17 +35,10 @@ sort_colors(){
 
 # Get colors from an image
 colors(){
-    max_attempts=10
-    attempt=1
     colors=()
-    echo -ne "[ ] Colors: Creating colorscheme attempt #$attempt"
-    while [ ${#colors[@]} -lt 16 ] && [ $attempt -le $max_attempts ]; do
-        echo -ne "\r[S] Colors: Creating colorscheme attempt #$attempt"
-        magick "$1" -resize 25% -colors 16 -unique-colors txt:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors"
-        mapfile -t colors < "$OUTPUT_DIR/colors"
-        attempt=$((attempt + 1))
-    done
-
+    echo -ne "[ ] Colors: Creating colorscheme"
+    magick "$1" -colors 16 -unique-colors txt:- | tail -n +2 | awk '{print $3}' > "$OUTPUT_DIR/colors"
+    mapfile -t colors < "$OUTPUT_DIR/colors"
     if [ "${#colors[@]}" -lt 16 ]; then
         echo -e "\r[ ] Colors: No change in colorscheme. Not enough colors extracted."
     else
@@ -52,6 +46,30 @@ colors(){
         echo -e "\r[S] Colors: Colorsheme created and saved.  "
         cols_gen=true
     fi
+}
+
+# Save the current color scheme to a JSON file
+save_colors_as_json() {
+    json_filename="$JSON_DIR/colorscheme_$(date +%Y%m%d_%H%M%S).json"
+    
+    echo "{" > "$json_filename"
+    
+    echo "  \"special\": {" >> "$json_filename"
+    echo "    \"background\": \"${colors[0]}\"," >> "$json_filename"
+    echo "    \"foreground\": \"${colors[7]}\"," >> "$json_filename"
+    echo "    \"cursor\": \"${colors[8]}\"" >> "$json_filename"
+    echo "  }," >> "$json_filename"
+
+    echo "  \"colors\": {" >> "$json_filename"
+    for i in {0..14}; do
+        echo "    \"color$i\": \"${colors[$i]}\"," >> "$json_filename"
+    done
+    echo "    \"color15\": \"${colors[15]}\"" >> "$json_filename" 
+    echo "  }" >> "$json_filename"
+    
+    echo "}" >> "$json_filename"
+
+    echo "[S] Colorscheme saved to $json_filename"
 }
 
 # Get and set colorscheme from json file.
@@ -127,8 +145,6 @@ templates(){
             template_name=$(basename "$template")
             output_template="$OUTPUT_DIR/$template_name"
 
-            # Replace placeholders in the template
-
             sed \
                 -e "s/{background}/$background/g" \
                 -e "s/{foreground}/$foreground/g" \
@@ -157,29 +173,6 @@ templates(){
     fi
 }
 
-# Exec a script after succesfully setting a colorscheme.
-scripts() {
-    echo -ne "[ ] Script: Running external scripts."
-    # Check if the directory exists
-    if [[ ! -d "$SCRIPTS_DIR" ]]; then
-        echo -e "\r[E] Script: No script found."
-        exit 1
-    fi
-    echo -e "\r[S] Script: Running external script"
-    # Iterate over all files in the directory
-    for file in "$SCRIPTS_DIR"/*; do
-        # Check if it's a regular file and if it's executable
-        if [[ -f "$file" && -x "$file" ]]; then
-            "$file" > /dev/null 2>&1 # Execute the file
-            if [ $? -eq 1 ]; then
-                echo -e "\r[E] Script: External script execution failed."
-                exit 1
-            fi
-        fi
-    done
-    echo -ne "[S] Script: External scripts run."
-}
-
 # Help string
 help_text(){
     echo 
@@ -187,11 +180,13 @@ help_text(){
     echo "Set wallpaper and generate colorscheme from an image."
     echo
     echo "Options:"
+    echo "  -w <image>    Set wallpaper."
     echo "  -i <image>    Set wallpaper and generate colorscheme from <image>."
     echo "  -j <json>     load colorscheme from <json>."
     echo "  -r            Restore wallpaper."
     echo
     echo "Examples:"
+    echo "  shwal -w ~/Pictures/wallpaper.jpg"
     echo "  shwal -i ~/Pictures/wallpaper.jpg"
     echo "  shwal -j ~/Files/gruvbox.json"
     echo "  shwal -r"
@@ -202,23 +197,30 @@ help_text(){
     echo 
 }
 
+# do when colors are generated.
 cols_gen_check(){
     if [ $cols_gen != true ]; then
         echo "[ ] Templates: not processed. colorscheme not generated."
-        echo "[ ] Script: Not run. colorscheme not generated."
         exit 1
     fi
 }
 
 # MAIN
 case $1 in
+    "-w")
+        if file --mime-type "$2" | grep -q "image"; then
+            set_wallpaper $2
+        else 
+            echo "Try: shwal -h"
+        fi
+        ;;
     "-i")
         if file --mime-type "$2" | grep -q "image"; then
             set_wallpaper $2
             colors $2
             cols_gen_check
+            save_colors_as_json
             templates
-            scripts
         else
             echo "Try: shwal -h"
         fi
@@ -228,7 +230,6 @@ case $1 in
             colors_from_json $2
             cols_gen_check
             templates
-            scripts
         else
             echo "Try: shwal -h"
         fi
@@ -246,4 +247,4 @@ case $1 in
         ;;
 esac
 
-# End
+# END
