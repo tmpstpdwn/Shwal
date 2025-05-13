@@ -3,12 +3,10 @@
 # Important variables.
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
-JSON_DIR="$HOME/.config/shwal/jsons"
 cols_gen=false
 
 # Check for the existance of output dir.
 mkdir -p "$OUTPUT_DIR"
-mkdir -p "$JSON_DIR"
 
 # Function to calculate the luminance of a color
 luminance() {
@@ -46,65 +44,6 @@ colors(){
         echo -e "\r[S] Colors: Colorsheme created and saved.  "
         cols_gen=true
     fi
-}
-
-# Save the current color scheme to a JSON file
-save_colors_as_json() {
-    json_filename="$JSON_DIR/colorscheme_$(date +%Y%m%d_%H%M%S).json"
-    
-    echo "{" > "$json_filename"
-    
-    echo "  \"special\": {" >> "$json_filename"
-    echo "    \"background\": \"${colors[0]}\"," >> "$json_filename"
-    echo "    \"foreground\": \"${colors[7]}\"," >> "$json_filename"
-    echo "    \"cursor\": \"${colors[8]}\"" >> "$json_filename"
-    echo "  }," >> "$json_filename"
-
-    echo "  \"colors\": {" >> "$json_filename"
-    for i in {0..14}; do
-        echo "    \"color$i\": \"${colors[$i]}\"," >> "$json_filename"
-    done
-    echo "    \"color15\": \"${colors[15]}\"" >> "$json_filename" 
-    echo "  }" >> "$json_filename"
-    
-    echo "}" >> "$json_filename"
-
-    echo "[S] Colorscheme saved to $json_filename"
-}
-
-# Get and set colorscheme from json file.
-colors_from_json(){
-    if ! command -v jq &> /dev/null; then
-        echo "[E] JSON Colors: 'jq' command not found. Please install 'jq' to use this feature."
-        exit 1
-    fi
-
-    json_file="$1"
-    colors=()
-    echo -ne "[ ] JSON colors: Reading colors from JSON file."
-
-    background=$(jq -r '.special.background' "$json_file")
-    foreground=$(jq -r '.special.foreground' "$json_file")
-    cursor=$(jq -r '.special.cursor' "$json_file")
-
-    for i in {0..15}; do
-        colors+=($(jq -r ".colors.color$i" "$json_file"))
-    done
-
-    if [ "${#colors[@]}" -lt 16 ]; then
-        echo "[ ] JSON Colors: JSON file does not contain enough colors."
-        exit 1
-    fi
-
-    echo "$background" > "$OUTPUT_DIR/colors"
-    echo "$foreground" >> "$OUTPUT_DIR/colors"
-    echo "$cursor" >> "$OUTPUT_DIR/colors"
-    for color in "${colors[@]}"; do
-        echo "$color" >> "$OUTPUT_DIR/colors"
-    done
-
-    echo -e "\r[S] JSON Colors: Colorscheme created from JSON file and saved."
-    cols_gen=true
 }
 
 # Set BG using feh
@@ -181,8 +120,7 @@ help_text(){
     echo ""
     echo "Options:"
     echo "  -w <image>    Set wallpaper."
-    echo "  -i <image>    Set wallpaper, generate colorscheme from <image>."
-    echo "  -j <json>     load colorscheme from <json>."
+    echo "  -i <image>    Set wallpaper, generate colorscheme, templates from <image>."
     echo "  -r            Restore wallpaper."
     echo ""
 }
@@ -208,16 +146,6 @@ case $1 in
         if file --mime-type "$2" | grep -q "image"; then
             set_wallpaper $2
             colors $2
-            cols_gen_check
-            save_colors_as_json
-            templates
-        else
-            echo "Try: shwal -h"
-        fi
-        ;;
-    "-j")
-        if file --mime-type "$2" | grep -q "json"; then
-            colors_from_json $2
             cols_gen_check
             templates
         else
