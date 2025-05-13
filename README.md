@@ -44,18 +44,6 @@ mv config/* ~/.config/shwal
 -  inside a template file colors can be substituted from the generated colorscheme by using `{color-key}`.
 - The following are the colorkeys
 `foreground`, `background`, `cursor`, `color0` ... `color15`.
-- The following is an example of a color template.
-
-  ```
-  * {
-  background: {background};
-  background-alt: {background};
-  foreground: {foreground};
-  selected: {cursor};
-  active: {color10};
-  urgent: {color9};
-  }
-  ```
 - Colorschemed templates generated are stored in `$HOME/cache/shwal`.
 
 ## License
