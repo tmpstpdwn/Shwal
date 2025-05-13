@@ -25,8 +25,6 @@ Options:
 git clone https://github.com/tmpstpdwn/shwal.git
 cd shwal
 mv src/shwal ~/.local/bin
-mkdir -p ~/.config/shwal
-mv config/* ~/.config/shwal
 ```
 
 - Make sure that `~/.local/bin` is in `$PATH`.
