@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Script Name: shwal
+# Description: shwal is a tool to set wallpaper and generate color schemes from an image.
+# Author: tmpstpdwn
+# Email: tmpstpdwn@tuta.io
+# Version: 1.0
+# Date Created: 2024-05-27
+# Last Modified: 2025-05-14
+# License: GPL3
+
 # Important variables.
 OUTPUT_DIR="$HOME/.cache/shwal"
 TEMPLATE_DIR="$HOME/.config/shwal/templates"
